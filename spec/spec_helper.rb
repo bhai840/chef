@@ -254,9 +254,17 @@ RSpec.configure do |config|
     Chef.resource_priority_map.instance_variable_set(:@map, resource_priority_map.dup)
   end
 
-  config.after(:each) do
-    puts "WTF1: #{Process.euid}" unless Process.euid == 0
-    puts "WTF2: #{Process.uid}" unless Process.uid == 0
+  if Process.euid == 0 && Process.uid == 0
+    config.after(:each) do
+      if Process.uid != 0
+        RSpec.configure { |c| c.fail_fast = true }
+        raise "rspec was invoked as root, but the last test dropped real uid to #{Process.uid}"
+      end
+      if Process.euid != 0
+        RSpec.configure { |c| c.fail_fast = true }
+        raise "rspec was invoked as root, but the last test dropped effective uid to #{Process.euid}"
+      end
+    end
   end
 
   # raise if anyone commits any test to CI with :focus set on it
