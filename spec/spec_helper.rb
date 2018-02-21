@@ -1,6 +1,6 @@
 #
 # Author:: Adam Jacob (<adam@chef.io>)
-# Copyright:: Copyright 2008-2017, Chef Software Inc.
+# Copyright:: Copyright 2008-2018, Chef Software Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -252,6 +252,11 @@ RSpec.configure do |config|
     Chef.resource_handler_map.instance_variable_set(:@map, resource_handler_map.dup)
     Chef.provider_priority_map.instance_variable_set(:@map, provider_priority_map.dup)
     Chef.resource_priority_map.instance_variable_set(:@map, resource_priority_map.dup)
+  end
+
+  config.after(:each) do
+    puts "WTF1: #{Process.euid}" unless Process.euid == 0
+    puts "WTF2: #{Process.uid}" unless Process.uid == 0
   end
 
   # raise if anyone commits any test to CI with :focus set on it
